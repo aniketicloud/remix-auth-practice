@@ -1,10 +1,23 @@
-import { ActionArgs, json } from "@remix-run/node";
+import type { ActionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { Form } from "@remix-run/react";
+import { createUser, getUserByEmail } from "~/models/user.server";
 import { validateEmail } from "~/utils";
 
 export default function Signup() {
   return (
     <Form method="post">
+      <div>
+        <label htmlFor="name">Name</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          required
+          defaultValue="Aniket"
+          autoFocus={true}
+        />
+      </div>
       <div>
         <label htmlFor="email">Email Address</label>
         <input
@@ -13,7 +26,6 @@ export default function Signup() {
           name="email"
           required
           defaultValue="aniket@gmail.com"
-          autoFocus={true}
         />
       </div>
       <div>
@@ -24,7 +36,15 @@ export default function Signup() {
           name="password"
           required
           defaultValue="11111111"
-          autoFocus={true}
+        />
+      </div>
+      <div>
+        <label htmlFor="isAdmin">Is this an Admin ?</label>
+        <input
+          type="checkbox"
+          name="isAdmin"
+          id="isAdmin"
+          defaultChecked={false}
         />
       </div>
       <input type="hidden" name="redirectTo" value="add implementation" />
@@ -38,6 +58,8 @@ export const action = async ({ request }: ActionArgs) => {
   const formData = await request.formData();
   const email = formData.get("email");
   const password = formData.get("password");
+  const name = formData.get("name") as string;
+  const isAdmin = !!formData.get("isAdmin");
 
   if (!validateEmail(email)) {
     return json(
@@ -60,7 +82,33 @@ export const action = async ({ request }: ActionArgs) => {
     );
   }
 
-  // const existingUser = await 
+  // regex is true if string has empty space
+  if (!/^\S{3,}$/.test(password)) {
+    return json(
+      {
+        errors: {
+          email: null,
+          password: "Password cannot contain a whitespace",
+        },
+      },
+      { status: 400 }
+    );
+  }
 
-  return null;
+  const existingUser = await getUserByEmail(email);
+  if (existingUser) {
+    return json(
+      {
+        errors: {
+          email: "A user already exists with this email",
+          password: null,
+        },
+      },
+      { status: 400 }
+    );
+  }
+
+  const user = createUser({ email, password, name, isAdmin });
+
+  return user;
 };
