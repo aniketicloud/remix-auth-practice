@@ -11,10 +11,10 @@ export const meta: V2_MetaFunction = () => {
 export default function Index() {
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <h1>Welcome to Remix</h1>
-      <Link to="/signup">Signup</Link>
+      <h1 className="text-3xl font-bold underline">Hello world!</h1>
+      <Link to="/join">Signup</Link>
       <br />
-      <Link to="/signin">Signin</Link>
+      <Link to="/login">Login</Link>
     </div>
   );
 }

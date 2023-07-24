@@ -14,7 +14,7 @@ model User {
   id         String       @id @default(cuid()) @map("_id")
   name       String
   email      String       @unique
-  Password   Password?
+  password   Password?
   isAdmin    Boolean
   Assignment Assignment[]
 }

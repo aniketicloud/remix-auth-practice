@@ -1,10 +1,12 @@
 import type { ActionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Form } from "@remix-run/react";
+import { Form, useSearchParams } from "@remix-run/react";
 import { createUser, getUserByEmail } from "~/models/user.server";
 import { validateEmail } from "~/utils";
 
-export default function Signup() {
+export default function Join() {
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo") ?? undefined;
   return (
     <Form method="post">
       <div>
@@ -47,7 +49,7 @@ export default function Signup() {
           defaultChecked={false}
         />
       </div>
-      <input type="hidden" name="redirectTo" value="add implementation" />
+      <input type="hidden" name="redirectTo" value={redirectTo} />
       <button>Sign Up</button>
     </Form>
   );
