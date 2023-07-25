@@ -1,3 +1,4 @@
+import type { User } from "@prisma/client";
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
 
@@ -15,10 +16,32 @@ export const sessionStorage = createCookieSessionStorage({
 });
 
 const USER_SESSION_KEY = "userId";
+const USER_SESSION_ROLE = "isAdmin";
 
 export async function getSession(request: Request) {
   const cookie = request.headers.get("cookie");
   return sessionStorage.getSession(cookie);
+}
+
+export async function getUserId(
+  request: Request
+): Promise<User["id"] | undefined> {
+  const session = await getSession(request);
+  const userId = session.get(USER_SESSION_KEY);
+  return userId;
+}
+
+export async function getIsAdmin(request: Request): Promise<User["isAdmin"]> {
+  const session = await getSession(request);
+  const isAdmin = session.get(USER_SESSION_ROLE);
+  return isAdmin;
+}
+
+export async function getUser(request:Request) {
+  const userId = await getUserId(request)
+  if(userId === undefined) return null
+
+  // const user = getUserbyid
 }
 
 export async function createUserSession({
@@ -26,14 +49,17 @@ export async function createUserSession({
   userId,
   remember,
   redirectTo,
+  isAdmin,
 }: {
   request: Request;
   userId: string;
   remember: boolean;
   redirectTo: string;
+  isAdmin: boolean;
 }) {
   const session = await getSession(request);
   session.set(USER_SESSION_KEY, userId);
+  session.set(USER_SESSION_ROLE, isAdmin);
   return redirect(redirectTo, {
     headers: {
       "Set-Cookie": await sessionStorage.commitSession(session, {
@@ -41,6 +67,15 @@ export async function createUserSession({
           ? 60 * 60 * 24 * 7 // 7 days
           : undefined,
       }),
+    },
+  });
+}
+
+export async function logout(request: Request) {
+  const session = await getSession(request);
+  return redirect("/", {
+    headers: {
+      "Set-Cookie": await sessionStorage.destroySession(session),
     },
   });
 }

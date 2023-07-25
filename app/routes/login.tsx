@@ -53,11 +53,13 @@ export const action = async ({ request }: ActionArgs) => {
     );
   }
 
+  console.log(user);
   return createUserSession({
     redirectTo,
     remember: remember === "on" ? true : false,
     request,
     userId: user.id,
+    isAdmin: user.isAdmin
   });
 };
 
