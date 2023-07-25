@@ -1,8 +1,17 @@
-import { json, type ActionArgs } from "@remix-run/node";
-import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
+import { json, redirect } from "@remix-run/node";
+import type { LoaderArgs, ActionArgs } from "@remix-run/node";
+
+import { Form, Link, useSearchParams } from "@remix-run/react";
 import { verifyLogin } from "~/models/user.server";
-import { createUserSession } from "~/session.server";
+import { createUserSession, getUserId } from "~/session.server";
 import { safeRedirect, validateEmail } from "~/utils";
+
+export const loader = async ({ request }: LoaderArgs) => {
+  const userId = await getUserId(request);
+  console.log(userId);
+  if (userId) return redirect("/");
+  return json({});
+};
 
 export const action = async ({ request }: ActionArgs) => {
   const formData = await request.formData();
@@ -53,13 +62,12 @@ export const action = async ({ request }: ActionArgs) => {
     );
   }
 
-  console.log(user);
   return createUserSession({
     redirectTo,
     remember: remember === "on" ? true : false,
     request,
     userId: user.id,
-    isAdmin: user.isAdmin
+    isAdmin: user.isAdmin,
   });
 };
 
