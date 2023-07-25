@@ -1,8 +1,15 @@
-import type { ActionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { ActionArgs, LoaderArgs } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { Form, useSearchParams } from "@remix-run/react";
 import { createUser, getUserByEmail } from "~/models/user.server";
+import { getIsAdmin } from "~/session.server";
 import { validateEmail } from "~/utils";
+
+export const loader = async ({ request }: LoaderArgs) => {
+  const isAdmin = await getIsAdmin(request);
+  if (!isAdmin) return redirect("/");
+  return json({});
+};
 
 export default function Join() {
   const [searchParams] = useSearchParams();
