@@ -1,5 +1,5 @@
 import { json, redirect } from "@remix-run/node";
-import type { LoaderArgs, ActionArgs } from "@remix-run/node";
+import type { LoaderArgs, ActionArgs, V2_MetaFunction } from "@remix-run/node";
 
 import { Form, Link, useSearchParams } from "@remix-run/react";
 import { verifyLogin } from "~/models/user.server";
@@ -70,6 +70,8 @@ export const action = async ({ request }: ActionArgs) => {
     isAdmin: user.isAdmin,
   });
 };
+
+export const meta: V2_MetaFunction = () => [{ title: "Login" }];
 
 export default function LoginPage() {
   const [searchParams] = useSearchParams();
