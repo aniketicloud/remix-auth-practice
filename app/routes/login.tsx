@@ -1,7 +1,8 @@
 import { json, redirect } from "@remix-run/node";
 import type { LoaderArgs, ActionArgs, V2_MetaFunction } from "@remix-run/node";
 
-import { Form, Link, useSearchParams } from "@remix-run/react";
+import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
+import { useRef } from "react";
 import { verifyLogin } from "~/models/user.server";
 import { createUserSession, getUserId } from "~/session.server";
 import { safeRedirect, validateEmail } from "~/utils";
@@ -76,7 +77,9 @@ export const meta: V2_MetaFunction = () => [{ title: "Login" }];
 export default function LoginPage() {
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") || "/dashboard";
-  // const actionData = useActionData<typeof action>()
+  const actionData = useActionData<typeof action>();
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
 
   return (
     <>
@@ -85,13 +88,19 @@ export default function LoginPage() {
           <label htmlFor="email">Email Address</label>
           <div>
             <input
-              type="email"
-              name="email"
+              ref={emailRef}
               id="email"
-              autoComplete="email"
               required
+              autoFocus={true}
+              name="email"
+              type="email"
+              autoComplete="email"
+              aria-invalid={actionData?.errors?.email ? true : undefined}
+              aria-describedby="email-error"
             />
-            {/* implement error */}
+            {actionData?.errors?.email ? (
+              <div className="error-class">{actionData.errors.email}</div>
+            ) : null}
           </div>
         </div>
 
@@ -100,12 +109,17 @@ export default function LoginPage() {
           <div>
             <input
               id="password"
+              ref={passwordRef}
               name="password"
               type="password"
               autoComplete="current-password"
+              aria-invalid={actionData?.errors?.password ? true : undefined}
+              aria-describedby="password-error"
               required
             />
-            {/* implement error */}
+            {actionData?.errors?.password ? (
+              <div className="error-class">{actionData.errors.password}</div>
+            ) : null}
           </div>
         </div>
 
@@ -113,8 +127,8 @@ export default function LoginPage() {
         <button type="submit">Log in</button>
         <div>
           <div>
-            <input type="checkbox" name="remember" id="remember" />
-            <label htmlFor="remember">Remember</label>
+            <input id="remember" name="remember" type="checkbox" />
+            <label htmlFor="remember">Remember me</label>
           </div>
 
           <div>
