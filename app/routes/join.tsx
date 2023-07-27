@@ -63,7 +63,19 @@ export default function Join() {
 }
 
 export const action = async ({ request }: ActionArgs) => {
-  // console.log(request);
+  const isLoggedInUserAdmin = await getIsAdmin(request);
+  if (!isLoggedInUserAdmin) {
+    return json(
+      {
+        errors: {
+          email: null,
+          password: null,
+          access: "You do not have the access to create a user",
+        },
+      },
+      { status: 400 }
+    );
+  }
   const formData = await request.formData();
   const email = formData.get("email");
   const password = formData.get("password");
