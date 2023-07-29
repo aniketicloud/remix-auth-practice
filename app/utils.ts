@@ -1,5 +1,16 @@
+import { User } from "@prisma/client";
+import { useMatches } from "@remix-run/react";
+import { useMemo } from "react";
+
 const DEFAULT_REDIRECT = "/";
 
+/**
+ * THis should be used any time the redirect path is user-provided
+ * (Like the query string on our login/signup pages). This avoids
+ * open-redirect vulnerabilities.
+ * @param {string } to The redirect destination
+ * @param [defaultRedirect=DEFAULT_REDIRECT] The redirect to use if the to is unsafe.
+ */
 export function safeRedirect(
   to: FormDataEntryValue | string | null | undefined,
   defaultRedirect: string = DEFAULT_REDIRECT
@@ -13,6 +24,43 @@ export function safeRedirect(
   }
 
   return to;
+}
+
+/**
+ * This base hook is used in other hooks to quickly search for specific data
+ * across all loader data using useMatches
+ * @param id The route id
+ * @returns The router data or undefined if not found
+ */
+export function useMatechesData(
+  id: string
+): Record<string, unknown> | undefined {
+  const matchingRoutes = useMatches();
+  const route = useMemo(
+    () => matchingRoutes.find((route) => route.id === id),
+    [matchingRoutes, id]
+  );
+  return route?.data;
+}
+
+function isUser(user: any): user is User {
+  return user && typeof user === "object" && typeof user.email === "string";
+}
+
+export function useOptionalUser(): User | undefined {
+  const data = useMatechesData("root");
+  if (!data || !isUser(data.user)) return undefined;
+  return data.user;
+}
+
+export function useUser(): User {
+  const maybeUser = useOptionalUser();
+  if (!maybeUser) {
+    throw new Error(
+      "No user found in root loader, but user is required by useUser. If user is optional, try useOptionalUser instead."
+    );
+  }
+  return maybeUser;
 }
 
 export function validateEmail(email: unknown): email is string {
