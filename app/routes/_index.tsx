@@ -25,7 +25,12 @@ export default function Index() {
         </div>
       ) : (
         <div>
-          <Link to="/login">Login</Link>
+          <Link
+            to="/login"
+            className="flex items-center justify-center bg-yellow-500 text-white rounded-md py-3 font-medium px-4"
+          >
+            Login
+          </Link>
         </div>
       )}
     </main>

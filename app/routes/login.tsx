@@ -23,20 +23,20 @@ export const action = async ({ request }: ActionArgs) => {
   if (!validateEmail(email)) {
     return json(
       { errors: { email: "Email is invalid", password: null } },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   if (typeof password !== "string" || password.length === 0) {
     return json(
       { errors: { email: null, password: "Password is required" } },
-      { status: 400 }
+      { status: 400 },
     );
   }
   if (password.length < 8) {
     return json(
       { errors: { email: null, password: "Password is too short" } },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -49,7 +49,7 @@ export const action = async ({ request }: ActionArgs) => {
           password: "Password cannot contain a whitespace",
         },
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -58,7 +58,7 @@ export const action = async ({ request }: ActionArgs) => {
   if (!user) {
     return json(
       { errors: { email: "Invalid email or password", password: null } },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
