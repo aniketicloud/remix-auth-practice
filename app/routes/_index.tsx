@@ -13,7 +13,9 @@ export default function Index() {
   const user = useOptionalUser();
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <h1>Welcome to our landing page!</h1>
+      <h1 className="text-xl text-blue-900 font-bold underline">
+        Welcome to our landing page!
+      </h1>
       {user ? (
         <div>
           <Link to="/dashboard">View your Dsahboard</Link>
