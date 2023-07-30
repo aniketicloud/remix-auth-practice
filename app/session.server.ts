@@ -37,11 +37,14 @@ export async function getIsAdmin(request: Request): Promise<User["isAdmin"]> {
   return isAdmin;
 }
 
-export async function getUser(request:Request) {
-  const userId = await getUserId(request)
-  if(userId === undefined) return null
+export async function getUser(request: Request) {
+  const userId = await getUserId(request);
+  if (userId === undefined) return null;
 
-  // const user = getUserbyid
+  const user = await getUserId(request);
+  if (user) return user;
+
+  throw await logout(request);
 }
 
 export async function createUserSession({

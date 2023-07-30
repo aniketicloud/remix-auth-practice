@@ -23,7 +23,7 @@ export default function Index() {
         </div>
       ) : (
         <div>
-          <Link to="/join">Signup</Link> <Link to="/login">Login</Link>
+          <Link to="/login">Login</Link>
         </div>
       )}
     </main>

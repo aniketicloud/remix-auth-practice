@@ -1,5 +1,5 @@
 import { cssBundleHref } from "@remix-run/css-bundle";
-import type { LinksFunction } from "@remix-run/node";
+import { json, type LinksFunction, type LoaderArgs } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -8,10 +8,16 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { getUser } from "./session.server";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
+
+export const loader = async ({ request }: LoaderArgs) => {
+  const user = await getUser(request);
+  return json({ user });
+};
 
 export default function App() {
   return (
@@ -22,7 +28,8 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body style={{backgroundColor: "#242424"}}>
+      <body>
+        {/* <body style={{backgroundColor: "#242424"}}> */}
         <Outlet />
         <ScrollRestoration />
         <Scripts />
